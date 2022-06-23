@@ -1,0 +1,110 @@
+
+				# Important Notes #
+# Use this code with the custome assembler for programming the logisim processor with the defined ISA
+# link for assembler -> https://hlorenzi.github.io/customasm/web/
+# make the assembler output format LOGISIM 16-bits to get the right machine code.
+
+
+
+#subruledef reg {
+R0 => 0
+R1 => 1
+R2 => 2
+R3 => 3
+R4 => 4
+R5 => 5
+R6 => 6
+R7 => 7 
+}
+
+#ruledef {
+   and {Rd:reg},{Rs:reg},{Rt:reg} => 0x0 @ Rs`3 @ Rt`3 @ Rd`3 @ 0b000
+   or  {Rd:reg},{Rs:reg},{Rt:reg} => 0x0 @ Rs`3 @ Rt`3 @ Rd`3 @ 0b001
+   nor {Rd:reg},{Rs:reg},{Rt:reg} => 0x0 @ Rs`3 @ Rt`3 @ Rd`3 @ 0b010
+   xor {Rd:reg},{Rs:reg},{Rt:reg} => 0x0 @ Rs`3 @ Rt`3 @ Rd`3 @ 0b011
+   sll {Rd:reg},{Rs:reg},{Rt:reg} => 0x0 @ Rs`3 @ Rt`3 @ Rd`3 @ 0b100
+   srl {Rd:reg},{Rs:reg},{Rt:reg} => 0x0 @ Rs`3 @ Rt`3 @ Rd`3 @ 0b101
+   sra {Rd:reg},{Rs:reg},{Rt:reg} => 0x0 @ Rs`3 @ Rt`3 @ Rd`3 @ 0b110
+   rol {Rd:reg},{Rs:reg},{Rt:reg} => 0x0 @ Rs`3 @ Rt`3 @ Rd`3 @ 0b111
+   add {Rd:reg},{Rs:reg},{Rt:reg} => 0x1 @ Rs`3 @ Rt`3 @ Rd`3 @ 0b000
+   sub {Rd:reg},{Rs:reg},{Rt:reg} => 0x1 @ Rs`3 @ Rt`3 @ Rd`3 @ 0b001
+   slt {Rd:reg},{Rs:reg},{Rt:reg} => 0x1 @ Rs`3 @ Rt`3 @ Rd`3 @ 0b010
+  sltu {Rd:reg},{Rs:reg},{Rt:reg} => 0x1 @ Rs`3 @ Rt`3 @ Rd`3 @ 0b011
+  slte {Rd:reg},{Rs:reg},{Rt:reg} => 0x1 @ Rs`3 @ Rt`3 @ Rd`3 @ 0b100
+  slteu {Rd:reg},{Rs:reg},{Rt:reg} => 0x1 @ Rs`3 @ Rt`3 @ Rd`3 @ 0b101
+  jr    {Rs:reg}                   => 0x1 @ Rs`3 @ 0`3 @ 0`3 @ 0b110
+  jalr  {Rd:reg},{Rs:reg}          => 0x1 @ Rs`3 @ 0`3 @ Rd`3 @ 0b111
+ 
+ lw {Rt:reg},{Rs:reg}, {immediate} => 0x2 @ Rs`3 @ Rt`3 @ immediate`6
+ sw {Rt:reg},{Rs:reg}, {immediate} => 0x3 @ Rs`3 @ Rt`3 @ immediate`6
+ andi {Rt:reg},{Rs:reg}, {immediate} => 0x6 @ Rs`3 @ Rt`3 @ immediate`6
+ ori {Rt:reg},{Rs:reg}, {immediate} => 0x7 @ Rs`3 @ Rt`3 @ immediate`6    
+ addi {Rt:reg},{Rs:reg}, {immediate} => 0x8 @ Rs`3 @ Rt`3 @ immediate`6  
+ beq {Rs:reg},{Rt:reg}, {immediate} => 0x4 @ Rs`3 @ Rt`3 @ immediate`6  
+ bne {Rs:reg},{Rt:reg}, {immediate} => 0x5 @ Rs`3 @ Rt`3 @ immediate`6
+ blt {Rs:reg},{Rt:reg}, {immediate} => 0xd @ Rs`3 @ Rt`3 @ immediate`6
+ bgt {Rs:reg},{Rt:reg}, {immediate} => 0xf @ Rs`3 @ Rt`3 @ immediate`6
+ bltz {Rs:reg},{Rt:reg}, {immediate} => 0xc @ Rs`3 @ Rt`3 @ immediate`6  
+ blez {Rs:reg},{Rt:reg}, {immediate} => 0xc @ Rs`3 @ Rt`3 @ immediate`6
+ bgtz {Rs:reg},{Rt:reg}, {immediate} => 0xd @ Rs`3 @ Rt`3 @ immediate`6  
+ bgez {Rs:reg},{Rt:reg}, {immediate} => 0xf @ Rs`3 @ Rt`3 @ immediate`6
+
+j {immediate} => 0x9 @ immediate`12
+jal {immediate} => 0xb @ immediate`12
+lui {immediate} => 0xa @ immediate`12
+
+}
+
+
+# this code below used for testing !
+
+ main:
+ 
+Lui 0x384
+Addi R5, R1,20
+Xor R3, R1, R5
+Lw R1, R0, 0 ; reg[1] <- mem[0]
+Lw R2, R0, 1 ;reg[2] <- mem[1]
+Lw R3, R0 , 2 ;reg[3] <- mem[2]
+Addi R4, R4, 10
+Sub R4, R4, R4
+Add R4, R2, R4
+Slt R6, R2, R3 
+Beq R6, R0, 2 ;If R6=R0 go forward 2 instructions 
+Add R2, R1, R2 
+Beq R0, R0, -5 ;go back 5 instructions
+Sw R4, R0, 0 ;mem[0] <- reg[4]
+Jal .func 
+Sll R3, R2, R5
+Add R5, R5, R5
+.func: or R5, R2, R3
+Lw R1, R0, 0
+Lw R2, R1, 5 ;reg[2] <- mem[60] 
+Lw R3 ,R1, 6 ;reg[3] <- mem[61]
+And R4, R2, R3 
+Sw R4, R0, 0 ;mem[0] <- reg[4]
+Jr R7
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
